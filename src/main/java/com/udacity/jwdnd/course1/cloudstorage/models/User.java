@@ -1,4 +1,4 @@
-package models;
+package com.udacity.jwdnd.course1.cloudstorage.models;
 
 public class User {
     private String firstName;
