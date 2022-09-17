@@ -14,14 +14,20 @@ public class NoteController {
         this.noteService = noteService;
     }
 
+    @PostMapping("/note")
+    public String postNoteForm(@ModelAttribute("note") Note note , Authentication authentication){
+        noteService.createNote(note,authentication);
+        return "redirect:/home";
+    }
     @DeleteMapping("/note/{noteId}")
     public String deleteNote(@PathVariable Integer noteId){
         noteService.deleteNote(noteId);
         return "redirect:/home";
     }
-    @PostMapping("/note")
-    public String postNoteForm(@ModelAttribute("note") Note note , Authentication authentication){
-        noteService.createNote(note,authentication);
+    @PutMapping("/note")
+    public String updateNote(@ModelAttribute("note") Note note)
+    {
+        noteService.UpdateNote(note);
         return "redirect:/home";
     }
 }
