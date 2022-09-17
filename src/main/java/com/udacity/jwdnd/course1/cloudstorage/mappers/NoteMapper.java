@@ -3,11 +3,14 @@ package com.udacity.jwdnd.course1.cloudstorage.mappers;
 import com.udacity.jwdnd.course1.cloudstorage.models.Note;
 import org.apache.ibatis.annotations.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Mapper
 public interface NoteMapper {
 
     @Select("SELECT * FROM NOTES WHERE userid = #{userId}")
-    Note[] getNotesByUserId(int userId);
+    List<Note> getNotesByUserId(int userId);
 
     @Select("SELECT * FROM NOTES WHERE noteid = #{noteId}")
     Note getNoteById(int noteId);
@@ -20,6 +23,6 @@ public interface NoteMapper {
     void updateNote(Note note);
 
     @Delete("DELETE FROM NOTES WHERE noteid = #{noteId}")
-    void deleteNote(Note note);
+    void deleteNote(int noteId);
 
 }
