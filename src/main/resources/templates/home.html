@@ -80,12 +80,12 @@
                         </thead>
                         <tbody>
                         <tr th:each="note : ${notes}">
-                            <td>
+                            <td th:object="${note}">
                                 <button type="button" class="btn btn-success"
-                                        th:attr="onclick=|showEditNoteModal('${note.noteId}','${note.noteTitle}','${note.noteDescription}')|">
+                                        th:attr="onclick=|showEditNoteModal('*{noteId}','*{noteTitle}','*{noteDescription}')|">
                                     Edit
                                 </button>
-                                <form th:action="@{/note/{noteId}(noteId = ${note.noteId})}" th:method="DELETE">
+                                <form th:action="@{/note/{noteId}(noteId = *{noteId})}" th:method="DELETE">
                                     <button type="submit" class="btn btn-danger">Delete</button>
                                 </form>
                             </td>
@@ -194,11 +194,14 @@
                         <tbody>
                         <tr th:each="encryptCredential,iterStat:${credentials[0]}">
                             <td th:object="${credentials[1][iterStat.index]}">
-                                <form action="" >
-                                    <button type="button" class="btn btn-success"
-                                            th:attr="onclick=|showEditCredentialModal('*{credentialId}','*{url}','*{username}','*{password}')|">Edit</button>
+                                <button type="button" class="btn btn-success"
+                                        th:attr="onclick=|showEditCredentialModal('*{credentialId}','*{url}','*{username}','*{password}')|">
+                                    Edit
+                                </button>
+                                <form th:action="@{/credential/{credentialId}(credentialId = *{credentialId})}"
+                                      th:method="DELETE">
+                                    <button type="submit" class="btn btn-danger">Delete</button>
                                 </form>
-                                <a class="btn btn-danger">Delete</a>
                             </td>
                             <th scope="row" th:text="${encryptCredential.url}">Example Credential URL</th>
                             <td th:text="${encryptCredential.username}">Example Credential Username</td>
@@ -287,7 +290,8 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary" onclick="$('#edit-credentialSubmit').click();">
+                                <button type="button" class="btn btn-primary"
+                                        onclick="$('#edit-credentialSubmit').click();">
                                     Save changes
                                 </button>
                             </div>
@@ -328,6 +332,7 @@
         $('#credential-password').val(password ? password : '');
         $('#credentialModal').modal('show');
     }
+
     function showEditCredentialModal(credentialId, url, username, password) {
         $('#edit-credential-id').val(credentialId ? credentialId : '');
         $('#edit-credential-url').val(url ? url : '');

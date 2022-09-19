@@ -25,7 +25,7 @@ public class CredentialService {
 
     private EncryptionService encryptionService;
 
-    public CredentialService(UserMapper userMapper, CredentialMapper credentialMapper,EncryptionService encryptionService) {
+    public CredentialService(UserMapper userMapper, CredentialMapper credentialMapper, EncryptionService encryptionService) {
         this.userMapper = userMapper;
         this.credentialMapper = credentialMapper;
         this.encryptionService = encryptionService;
@@ -39,7 +39,7 @@ public class CredentialService {
         String encryptedPassword = encryptionService.encryptValue(credential.getPassword(), encodedKey);
         String loggedInUserName = authentication.getName();
         User loggedInUser = userMapper.getUser(loggedInUserName);
-        if(loggedInUser == null)
+        if (loggedInUser == null)
             throw new AuthenticationCredentialsNotFoundException("");
         credential.setPassword(encryptedPassword);
         credential.setKey(encodedKey);
@@ -47,26 +47,26 @@ public class CredentialService {
         credentialMapper.insertCredential(credential);
     }
 
-    public List<Credential> getEncryptCredentialsByUserId(Authentication authentication) throws AuthenticationException  {
+    public List<Credential> getEncryptCredentialsByUserId(Authentication authentication) throws AuthenticationException {
         String loggedInUserName = authentication.getName();
         User loggedInUser = userMapper.getUser(loggedInUserName);
-        if(loggedInUser == null)
+        if (loggedInUser == null)
             throw new AuthenticationCredentialsNotFoundException("");
         return credentialMapper.getCredentialsByUserId(loggedInUser.getUserId());
     }
-    public List<Credential> getDecryptCredentialsByUserId(Authentication authentication) throws AuthenticationException  {
+
+    public List<Credential> getDecryptCredentialsByUserId(Authentication authentication) throws AuthenticationException {
         String loggedInUserName = authentication.getName();
         User loggedInUser = userMapper.getUser(loggedInUserName);
-        if(loggedInUser == null)
+        if (loggedInUser == null)
             throw new AuthenticationCredentialsNotFoundException("");
         return credentialMapper.getCredentialsByUserId(loggedInUser.getUserId()).stream().map(credential -> {
-            credential.setPassword(encryptionService.decryptValue(credential.getPassword(),credential.getKey()));
+            credential.setPassword(encryptionService.decryptValue(credential.getPassword(), credential.getKey()));
             return credential;
         }).collect(Collectors.toList());
     }
 
-    public void updateCredential(Credential credential)
-    {
+    public void updateCredential(Credential credential) {
         SecureRandom random = new SecureRandom();
         byte[] key = new byte[16];
         random.nextBytes(key);
@@ -75,6 +75,10 @@ public class CredentialService {
         credential.setKey(encodedKey);
         credential.setPassword(encryptedPassword);
         credentialMapper.updateCredential(credential);
+    }
+
+    public void deleteCredentials(int credentialId) {
+        credentialMapper.deleteCredential(credentialId);
     }
 
 
