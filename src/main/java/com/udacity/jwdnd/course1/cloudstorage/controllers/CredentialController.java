@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 
 @Controller
 public class CredentialController {
@@ -19,6 +20,11 @@ public class CredentialController {
     public String postCredentialsForm(@ModelAttribute("credential")Credential credential,Authentication authentication)
     {
         credentialService.CreateCredential(credential,authentication);
+        return "redirect:/home";
+    }
+    @PutMapping("/credential")
+    public String updateCredential(@ModelAttribute("credential")Credential credential){
+        credentialService.updateCredential(credential);
         return "redirect:/home";
     }
 }

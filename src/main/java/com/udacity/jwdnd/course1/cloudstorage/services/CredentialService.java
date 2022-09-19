@@ -37,7 +37,6 @@ public class CredentialService {
         random.nextBytes(key);
         String encodedKey = Base64.getEncoder().encodeToString(key);
         String encryptedPassword = encryptionService.encryptValue(credential.getPassword(), encodedKey);
-        System.out.println(encryptedPassword);
         String loggedInUserName = authentication.getName();
         User loggedInUser = userMapper.getUser(loggedInUserName);
         if(loggedInUser == null)
@@ -66,6 +65,17 @@ public class CredentialService {
         }).collect(Collectors.toList());
     }
 
+    public void updateCredential(Credential credential)
+    {
+        SecureRandom random = new SecureRandom();
+        byte[] key = new byte[16];
+        random.nextBytes(key);
+        String encodedKey = Base64.getEncoder().encodeToString(key);
+        String encryptedPassword = encryptionService.encryptValue(credential.getPassword(), encodedKey);
+        credential.setKey(encodedKey);
+        credential.setPassword(encryptedPassword);
+        credentialMapper.updateCredential(credential);
+    }
 
 
 }
