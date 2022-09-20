@@ -3,18 +3,18 @@ package com.udacity.jwdnd.course1.cloudstorage.models;
 import java.sql.Blob;
 
 public class File {
-    private Blob fileData;
+    private byte[] fileData;
     private String fileName;
     private String contentType;
     private String fileSize;
     private Integer fileId;
     private Integer userId;
 
-    public Blob getFileData() {
+    public byte[] getFileData() {
         return fileData;
     }
 
-    public void setFileData(Blob fileData) {
+    public void setFileData(byte[] fileData) {
         this.fileData = fileData;
     }
 
