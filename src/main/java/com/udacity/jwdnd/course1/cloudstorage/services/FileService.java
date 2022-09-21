@@ -45,8 +45,7 @@ public class FileService {
         return fileMapper.getStoredFileNames(loggedInUser.getUserId());
     }
 
-    public List<Integer> getStoredFilesIds(Authentication authentication) throws AuthenticationException
-    {
+    public List<Integer> getStoredFilesIds(Authentication authentication) throws AuthenticationException {
         String loggedInUserName = authentication.getName();
         User loggedInUser = userMapper.getUser(loggedInUserName);
         if (loggedInUser == null)
@@ -55,6 +54,11 @@ public class FileService {
     }
 
     public File getStoredFile(int fileId) {
+
         return fileMapper.getFileData(fileId);
+    }
+
+    public void deleteFile(int fileId) {
+        fileMapper.deleteFile(fileId);
     }
 }
