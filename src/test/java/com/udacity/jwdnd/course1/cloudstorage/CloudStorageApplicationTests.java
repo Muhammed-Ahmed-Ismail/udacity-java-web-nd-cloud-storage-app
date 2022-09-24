@@ -51,7 +51,7 @@ class CloudStorageApplicationTests {
 	public void getSignupPage()
 	{
 		driver.get("http://localhost:" + this.port + "/signup");
-		Assertions.assertEquals("signup",driver.getTitle());
+		Assertions.assertEquals("Sign Up",driver.getTitle());
 	}
 	@Test
 	public void getHomePageAsUnauthorizedUser()
@@ -92,8 +92,8 @@ class CloudStorageApplicationTests {
 	@Test
 	public void updateNote()
 	{
-		doMockSignUp("CN","CN","CN","CN");
-		doLogIn("CN","CN");
+		doMockSignUp("UN","UN","UN","UN");
+		doLogIn("UN","UN");
 		WebDriverWait webDriverWait = new WebDriverWait(driver,2);
 		webDriverWait.until(ExpectedConditions.urlContains("home"));
 		createNote("note1","description of note 1");
@@ -123,8 +123,8 @@ class CloudStorageApplicationTests {
 	@Test
 	public void viewNote()
 	{
-		doMockSignUp("CN","CN","CN","CN");
-		doLogIn("CN","CN");
+		doMockSignUp("VN","VN","VN","VN");
+		doLogIn("VN","VN");
 		WebDriverWait webDriverWait = new WebDriverWait(driver,2);
 		webDriverWait.until(ExpectedConditions.urlContains("home"));
 		createNote("note1","description of note 1");
@@ -134,8 +134,8 @@ class CloudStorageApplicationTests {
 	@Test
 	public void deleteNote()
 	{
-		doMockSignUp("CN","CN","CN","CN");
-		doLogIn("CN","CN");
+		doMockSignUp("DN","DN","DN","DN");
+		doLogIn("DN","DN");
 		WebDriverWait webDriverWait = new WebDriverWait(driver,2);
 		webDriverWait.until(ExpectedConditions.urlContains("home"));
 		createNote("note1","description of note 1");
@@ -147,17 +147,138 @@ class CloudStorageApplicationTests {
 		List<WebElement> noteTableRecords = driver.findElements(By.cssSelector("table#userTable > tbody *"));
 		Assertions.assertEquals(0,noteTableRecords.size());
 	}
+	@Test
+	public void createCredential()
+	{
+		doMockSignUp("CC","CC","CC","CC");
+		doLogIn("CC","CC");
+		WebDriverWait webDriverWait = new WebDriverWait(driver,2);
+		webDriverWait.until(ExpectedConditions.urlContains("home"));
+		createCredential("url1","username1","123");
+		checkCredential("url1","username1","123");
+
+	}
+	@Test
+	public void viewCredential()
+	{
+		doMockSignUp("VC","VC","VC","VC");
+		doLogIn("VC","VC");
+		WebDriverWait webDriverWait = new WebDriverWait(driver,2);
+		webDriverWait.until(ExpectedConditions.urlContains("home"));
+		createCredential("url1","username1","123");
+		openCredentialModal(webDriverWait);
+		Assertions.assertEquals("url1",driver.findElement(By.id("edit-credential-url")).getAttribute("value"));
+		Assertions.assertEquals("username1",driver.findElement(By.id("edit-credential-username")).getAttribute("value"));
+		Assertions.assertEquals("123",driver.findElement(By.id("edit-credential-password")).getAttribute("value"));
+	}
+	@Test
+	public void updateCredential()
+	{
+		doMockSignUp("EC","EC","EC","EC");
+		doLogIn("EC","EC");
+		WebDriverWait webDriverWait = new WebDriverWait(driver,2);
+		webDriverWait.until(ExpectedConditions.urlContains("home"));
+		createCredential("url1","username1","123");
+		openCredentialModal(webDriverWait);
+		WebElement 	urlInput = driver.findElement(By.id("edit-credential-url"));
+		WebElement 	userNameInput = driver.findElement(By.id("edit-credential-username"));
+		WebElement 	passwordInput = driver.findElement(By.id("edit-credential-password"));
+		WebElement 	submitEditButton = driver.findElement(By.id("editCredential-submit"));
+		urlInput.click();
+		urlInput.clear();
+		urlInput.sendKeys("edited url");
+		userNameInput.click();
+		userNameInput.clear();
+		userNameInput.sendKeys("edited username");
+		passwordInput.click();
+		passwordInput.clear();
+		passwordInput.sendKeys("edited password");
+		submitEditButton.click();
+		checkSuccessAndContinue(webDriverWait);
+		navigateToCredentialsTab();
+		openCredentialModal(webDriverWait);
+		checkCredential("edited url","edited username","edited password");
+	}
+	@Test
+	public void deleteCredential()
+	{
+		doMockSignUp("DC","DC","DC","DC");
+		doLogIn("DC","DC");
+		WebDriverWait webDriverWait = new WebDriverWait(driver,2);
+		webDriverWait.until(ExpectedConditions.urlContains("home"));
+		createCredential("url1","username1","123");
+		WebElement credentialDeleteButton = driver.findElement(By.cssSelector("table#credentialTable > tbody > tr:nth-child(1) > td:nth-child(1) > form > button"));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("btn-danger")));
+		credentialDeleteButton.click();
+		checkSuccessAndContinue(webDriverWait);
+		navigateToCredentialsTab();
+		List<WebElement> credentialTableRecords = driver.findElements(By.cssSelector("table#credentialTable > tbody *"));
+		Assertions.assertEquals(0,credentialTableRecords.size());
+
+
+	}
+	private void openCredentialModal(WebDriverWait webDriverWait)
+	{
+		WebElement credentialEditButton = driver.findElement(By.cssSelector("table#credentialTable > tbody > tr:nth-child(1) > td:nth-child(1) > button:nth-child(1)"));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("btn-success")));
+		credentialEditButton.click();
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("edit-credential-url")));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("edit-credential-username")));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("edit-credential-password")));
+	}
+	private void navigateToCredentialsTab()
+	{
+		WebElement notesTab = driver.findElement(By.id("nav-credentials-tab"));
+		notesTab.click();
+	}
+	private void createCredential(String url,String username,String password)
+	{
+		navigateToCredentialsTab();
+		WebDriverWait webDriverWait = new WebDriverWait(driver,2);
+		WebElement addCredentialButton = driver.findElement(By.id("add-credential"));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("add-credential")));
+		addCredentialButton.click();
+		WebElement credentialUrlInput = driver.findElement(By.id("credential-url"));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("credential-url")));
+		credentialUrlInput.click();
+		credentialUrlInput.sendKeys(url);
+		WebElement credentialUsernameInput = driver.findElement(By.id("credential-username"));
+		credentialUsernameInput.click();
+		credentialUsernameInput.sendKeys(username);
+		WebElement credentialPasswordInput = driver.findElement(By.id("credential-password"));
+		credentialPasswordInput.click();
+		credentialPasswordInput.sendKeys(password);
+		WebElement credentialSubmit = driver.findElement(By.id("credential-submit"));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("credential-submit")));
+		credentialSubmit.click();
+		webDriverWait.until(ExpectedConditions.urlContains("result"));
+		checkSuccessAndContinue(webDriverWait);
+		navigateToCredentialsTab();
+
+	}
 	private void navigateToNoteTab()
 	{
 		WebElement notesTab = driver.findElement(By.id("nav-notes-tab"));
 		notesTab.click();
 	}
+
+	private void checkCredential(String url,String username,String password)
+	{
+		WebElement credentialUrl = driver.findElement(By.cssSelector("table#credentialTable > tbody > tr:nth-child(1) > th:nth-child(2)"));
+		Assertions.assertEquals(url,credentialUrl.getAttribute("innerText"));
+		WebElement credentialUsername = driver.findElement(By.cssSelector("table#credentialTable > tbody > tr:nth-child(1) > td:nth-child(3)"));
+		Assertions.assertEquals(username,credentialUsername.getAttribute("innerText"));
+		WebElement credentialPassword = driver.findElement(By.cssSelector("table#credentialTable > tbody > tr:nth-child(1) > td:nth-child(4)"));
+		Assertions.assertNotEquals(password, credentialPassword.getAttribute("innerText"));
+	}
+
 	private void checkNote(String title,String description)
 	{
-		WebElement firstNoteTitle = driver.findElement(By.cssSelector("table#userTable > tbody > tr:nth-child(1) > th:nth-child(2)"));
-		Assertions.assertNotEquals(title,firstNoteTitle.getText());
-		WebElement firstNoteDesc = driver.findElement(By.cssSelector("table#userTable > tbody > tr:nth-child(1) > td:nth-child(3)"));
-		Assertions.assertNotEquals(description,firstNoteDesc.getText());
+		WebElement firstNoteTitle = driver.findElement(By.cssSelector("table#userTable > tbody:nth-child(2) > tr:nth-child(1) > th:nth-child(2)"));
+		System.out.println(firstNoteTitle.getTagName());
+		Assertions.assertEquals(title,firstNoteTitle.getAttribute("innerText"));
+		WebElement firstNoteDesc = driver.findElement(By.cssSelector("table#userTable > tbody:nth-child(2) > tr:nth-child(1) > td:nth-child(3)"));
+		Assertions.assertEquals(description,firstNoteDesc.getAttribute("innerText"));
 	}
 
 	private void createNote(String title,String description)
@@ -181,7 +302,6 @@ class CloudStorageApplicationTests {
 		checkSuccessAndContinue(webDriverWait);
 		navigateToNoteTab();
 	}
-
 	/**
 	 * PLEASE DO NOT DELETE THIS method.
 	 * Helper method for Udacity-supplied sanity checks.
