@@ -1,5 +1,6 @@
 package com.udacity.jwdnd.course1.cloudstorage.controllers;
 
+import com.udacity.jwdnd.course1.cloudstorage.exceptions.FileNameExists;
 import com.udacity.jwdnd.course1.cloudstorage.models.Credential;
 import com.udacity.jwdnd.course1.cloudstorage.models.Note;
 import com.udacity.jwdnd.course1.cloudstorage.services.CredentialService;
@@ -24,7 +25,7 @@ public class HomeController {
 
     private FileService fileService;
 
-    public HomeController(NoteService noteService,CredentialService credentialService,FileService fileService) {
+    public HomeController(NoteService noteService, CredentialService credentialService, FileService fileService) {
         this.noteService = noteService;
         this.credentialService = credentialService;
         this.fileService = fileService;
@@ -43,10 +44,10 @@ public class HomeController {
             List<Integer> filesIds = fileService.getStoredFilesIds(authentication);
             model.addAttribute("notes", noteService.getNotesByUserId(authentication));
             model.addAttribute("credentials", credentials);
-            model.addAttribute("filesNames",filesNames);
-            model.addAttribute("fileIds",filesIds);
+            model.addAttribute("filesNames", filesNames);
+            model.addAttribute("fileIds", filesIds);
             return "home";
-        } catch (AuthenticationException e){
+        } catch (AuthenticationException e) {
             return "login";
         }
     }

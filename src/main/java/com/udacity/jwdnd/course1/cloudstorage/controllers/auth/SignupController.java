@@ -25,7 +25,7 @@ public class SignupController {
         model.addAttribute("signupSuccess",false);
         return "signup";
     }
-
+//TODO change redirecting only when user is created successfully
     @PostMapping()
     public String postForm(@ModelAttribute("user")User user, Model model)
     {
