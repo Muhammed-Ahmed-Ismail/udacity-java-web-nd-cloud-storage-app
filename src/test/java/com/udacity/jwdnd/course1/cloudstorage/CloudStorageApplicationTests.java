@@ -121,6 +121,17 @@ class CloudStorageApplicationTests {
 		checkNote("edited note1 title","edited note1 Desc");
 	}
 	@Test
+	public void viewNote()
+	{
+		doMockSignUp("CN","CN","CN","CN");
+		doLogIn("CN","CN");
+		WebDriverWait webDriverWait = new WebDriverWait(driver,2);
+		webDriverWait.until(ExpectedConditions.urlContains("home"));
+		createNote("note1","description of note 1");
+		navigateToNoteTab();
+		checkNote("note1","description of note 1");
+	}
+	@Test
 	public void deleteNote()
 	{
 		doMockSignUp("CN","CN","CN","CN");
