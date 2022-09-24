@@ -13,6 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 
 import java.io.File;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CloudStorageApplicationTests {
 
@@ -42,6 +45,130 @@ class CloudStorageApplicationTests {
 	public void getLoginPage() {
 		driver.get("http://localhost:" + this.port + "/login");
 		Assertions.assertEquals("Login", driver.getTitle());
+	}
+
+	@Test
+	public void getSignupPage()
+	{
+		driver.get("http://localhost:" + this.port + "/signup");
+		Assertions.assertEquals("signup",driver.getTitle());
+	}
+	@Test
+	public void getHomePageAsUnauthorizedUser()
+	{
+		driver.get("http://localhost:" + this.port + "/home");
+		Assertions.assertNotEquals("home",driver.getTitle());
+		WebDriverWait webDriverWait = new WebDriverWait(driver, 2);
+		webDriverWait.until(ExpectedConditions.urlContains("login"));
+		Assertions.assertEquals("Login",driver.getTitle());
+	}
+	@Test
+	public void LoginThenLogout()
+	{
+		doMockSignUp("logout","test","log","123");
+		doLogIn("log","123");
+		WebDriverWait webDriverWait = new WebDriverWait(driver,2);
+		webDriverWait.until(ExpectedConditions.urlContains("home"));
+		Assertions.assertEquals("Home",driver.getTitle());
+		WebElement logoutButton = driver.findElement(By.id("logout"));
+		logoutButton.click();
+		webDriverWait.until(ExpectedConditions.urlContains("login"));
+		driver.get("http://localhost:" + this.port + "/home");
+		webDriverWait.until(ExpectedConditions.urlContains("login"));
+		Assertions.assertEquals("Login",driver.getTitle());
+	}
+	@Test
+	public void createNote()
+	{
+
+		doMockSignUp("CN","CN","CN","CN");
+		doLogIn("CN","CN");
+		WebDriverWait webDriverWait = new WebDriverWait(driver,2);
+		webDriverWait.until(ExpectedConditions.urlContains("home"));
+		createNote("note1","description of note 1");
+		checkNote("note1","description of note 1");
+	}
+
+	@Test
+	public void updateNote()
+	{
+		doMockSignUp("CN","CN","CN","CN");
+		doLogIn("CN","CN");
+		WebDriverWait webDriverWait = new WebDriverWait(driver,2);
+		webDriverWait.until(ExpectedConditions.urlContains("home"));
+		createNote("note1","description of note 1");
+		WebElement firstNoteEditButton = driver.findElement(By.cssSelector("table#userTable > tbody > tr:nth-child(1) > td:nth-child(1) > button:nth-child(1)"));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("btn-success")));
+		firstNoteEditButton.click();
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("edit-note-title")));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("edit-note-description")));
+		WebElement editNoteTitle = driver.findElement(By.id("edit-note-title"));
+		WebElement editNoteDesc = driver.findElement(By.id("edit-note-description"));
+		Assertions.assertEquals("note1",editNoteTitle.getAttribute("value"));
+		Assertions.assertEquals("description of note 1",editNoteDesc.getAttribute("value"));
+		editNoteTitle.click();
+		editNoteTitle.clear();
+		editNoteTitle.sendKeys("edited note1 title");
+		editNoteDesc.click();
+		editNoteDesc.clear();
+		editNoteDesc.sendKeys("edited note1 Desc");
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("save-note-edit")));
+		WebElement noteSubmit = driver.findElement(By.id("save-note-edit"));
+		noteSubmit.click();
+		webDriverWait.until(ExpectedConditions.urlContains("result"));
+		checkSuccessAndContinue(webDriverWait);
+		navigateToNoteTab();
+		checkNote("edited note1 title","edited note1 Desc");
+	}
+	@Test
+	public void deleteNote()
+	{
+		doMockSignUp("CN","CN","CN","CN");
+		doLogIn("CN","CN");
+		WebDriverWait webDriverWait = new WebDriverWait(driver,2);
+		webDriverWait.until(ExpectedConditions.urlContains("home"));
+		createNote("note1","description of note 1");
+		WebElement firstNoteDeleteButton = driver.findElement(By.cssSelector("table#userTable > tbody > tr:nth-child(1) > td:nth-child(1) > form > button"));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("btn-danger")));
+		firstNoteDeleteButton.click();
+		checkSuccessAndContinue(webDriverWait);
+		navigateToNoteTab();
+		List<WebElement> noteTableRecords = driver.findElements(By.cssSelector("table#userTable > tbody *"));
+		Assertions.assertEquals(0,noteTableRecords.size());
+	}
+	private void navigateToNoteTab()
+	{
+		WebElement notesTab = driver.findElement(By.id("nav-notes-tab"));
+		notesTab.click();
+	}
+	private void checkNote(String title,String description)
+	{
+		WebElement firstNoteTitle = driver.findElement(By.cssSelector("table#userTable > tbody > tr:nth-child(1) > th:nth-child(2)"));
+		Assertions.assertNotEquals(title,firstNoteTitle.getText());
+		WebElement firstNoteDesc = driver.findElement(By.cssSelector("table#userTable > tbody > tr:nth-child(1) > td:nth-child(3)"));
+		Assertions.assertNotEquals(description,firstNoteDesc.getText());
+	}
+
+	private void createNote(String title,String description)
+	{
+		navigateToNoteTab();
+		WebDriverWait webDriverWait = new WebDriverWait(driver,2);
+		WebElement addNoteButton = driver.findElement(By.id("add-note"));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("add-note")));
+		addNoteButton.click();
+		WebElement noteTitleInput = driver.findElement(By.id("note-title"));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("note-title")));
+		noteTitleInput.click();
+		noteTitleInput.sendKeys(title);
+		WebElement noteDescriptionInput = driver.findElement(By.id("note-description"));
+		noteDescriptionInput.click();
+		noteDescriptionInput.sendKeys(description);
+		WebElement noteSubmit = driver.findElement(By.id("note-submit"));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("note-submit")));
+		noteSubmit.click();
+		webDriverWait.until(ExpectedConditions.urlContains("result"));
+		checkSuccessAndContinue(webDriverWait);
+		navigateToNoteTab();
 	}
 
 	/**
@@ -196,6 +323,14 @@ class CloudStorageApplicationTests {
 			System.out.println("Large File upload failed");
 		}
 		Assertions.assertFalse(driver.getPageSource().contains("HTTP Status 403 – Forbidden"));
+
+	}
+
+	private void checkSuccessAndContinue(WebDriverWait webDriverWait)
+	{
+		WebElement continueElement = driver.findElement(By.cssSelector("#success a"));
+		continueElement.click();
+		webDriverWait.until(ExpectedConditions.urlContains("home"));
 
 	}
 

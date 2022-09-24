@@ -12,7 +12,7 @@
 <div class="container">
     <div id="logoutDiv">
         <form action="#" th:action="@{/logout}" method="POST">
-            <button type="submit" class="btn btn-secondary float-right">Logout</button>
+            <button type="submit" id="logout" class="btn btn-secondary float-right">Logout</button>
         </form>
     </div>
     <div id="contentDiv" style="clear: right;">
@@ -59,7 +59,8 @@
                             <td>
                                 <a target="_blank" class="btn btn-success"
                                    th:href="@{/file/{fileId}(fileId = ${fileIds[iterState.index]})}">View</a>
-                                <form  th:action="@{/file/{fileId}(fileId = ${fileIds[iterState.index]})}" th:method="DELETE">
+                                <form th:action="@{/file/{fileId}(fileId = ${fileIds[iterState.index]})}"
+                                      th:method="DELETE">
                                     <button type="submit" class="btn btn-danger">Delete</button>
                                 </form>
                             </td>
@@ -71,7 +72,7 @@
             </div>
             <div class="tab-pane fade" id="nav-notes" role="tabpanel" aria-labelledby="nav-notes-tab">
                 <button style="margin: 0.25em;" type="button" class="btn btn-info float-right"
-                        onclick="showNoteModal()">
+                        onclick="showNoteModal()" th:id="add-note">
                     + Add a New Note
                 </button>
 
@@ -95,8 +96,10 @@
                                     <button type="submit" class="btn btn-danger">Delete</button>
                                 </form>
                             </td>
-                            <th scope="row" th:text="${note.noteTitle}"></th>
-                            <td th:text="${note.noteDescription}">Example Note Description</td>
+                            <th scope="row" th:text="${note.noteTitle}" class="note-title"></th>
+                            <td th:text="${note.noteDescription}" class="note-desc">Example Note
+                                Description
+                            </td>
                         </tr>
                         </tbody>
                     </table>
@@ -132,7 +135,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary" onclick="$('#noteSubmit').click();">Save
+                                <button type="button" class="btn btn-primary" id="note-submit" onclick="$('#noteSubmit').click();">Save
                                     changes
                                 </button>
                             </div>
@@ -170,7 +173,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary" onclick="$('#edit-noteSubmit').click();">
+                                <button type="button" id="save-note-edit" class="btn btn-primary" onclick="$('#edit-noteSubmit').click();">
                                     Save
                                     changes
                                 </button>
