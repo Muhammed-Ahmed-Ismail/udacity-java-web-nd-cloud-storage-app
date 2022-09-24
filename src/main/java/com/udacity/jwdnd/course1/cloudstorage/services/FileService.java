@@ -34,14 +34,15 @@ public class FileService {
     }
 
     public void addFile(MultipartFile file, Authentication authentication) throws AuthenticationException, IOException, FileNameExists {
-        if (isFileNameExisted(file.getOriginalFilename())) {
-            throw new FileNameExists("");
-        }
         File fileDto = new File();
         String loggedInUserName = authentication.getName();
         User loggedInUser = userMapper.getUser(loggedInUserName);
-        if (loggedInUser == null)
+        if (loggedInUser == null) {
             throw new AuthenticationCredentialsNotFoundException("");
+        }
+        if (isFileNameExisted(file.getOriginalFilename(),loggedInUser.getUserId())){
+            throw new FileNameExists("");
+        }
         fileDto.setFileName(file.getOriginalFilename());
         fileDto.setFileData(file.getBytes());
         fileDto.setContentType(file.getContentType());
@@ -72,10 +73,11 @@ public class FileService {
     }
 
     public void deleteFile(int fileId) {
+
         fileMapper.deleteFile(fileId);
     }
 
-    private boolean isFileNameExisted(String fileName) {
-        return fileMapper.getFileId(fileName) != null;
+    private boolean isFileNameExisted(String fileName, Integer userId) {
+        return fileMapper.getFileId(fileName,userId) != null;
     }
 }

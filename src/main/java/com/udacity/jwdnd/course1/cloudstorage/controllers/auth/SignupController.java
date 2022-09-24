@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/signup")
@@ -27,19 +29,20 @@ public class SignupController {
     }
 //TODO change redirecting only when user is created successfully
     @PostMapping()
-    public String postForm(@ModelAttribute("user")User user, Model model)
+    public String postForm(@ModelAttribute("user")User user, Model model, RedirectAttributes redirectAttributes)
     {
         if(userService.isUserNameAvailable(user))
         {
             model.addAttribute("signupError",true);
             model.addAttribute("signupSuccess",false);
-
+           return "signup";
         } else
         {
             userService.createUser(user);
-            model.addAttribute("signupError",false);
-            model.addAttribute("signupSuccess",true);
+            redirectAttributes.addFlashAttribute("signupError",false);
+            redirectAttributes.addFlashAttribute("signupSuccess",true);
+            redirectAttributes.addFlashAttribute("successMessage",true);
+            return "redirect:/login";
         }
-        return "redirect:/login";
     }
 }

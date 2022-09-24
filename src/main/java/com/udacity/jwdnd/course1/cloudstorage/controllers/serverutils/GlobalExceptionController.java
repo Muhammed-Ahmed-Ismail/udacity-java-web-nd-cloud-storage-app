@@ -7,26 +7,29 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 
 @ControllerAdvice
 public class GlobalExceptionController {
     @ExceptionHandler(value = MaxUploadSizeExceededException.class)
-    public ModelAndView handelExceedIUploadedFileSize(MaxUploadSizeExceededException e) {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("home");
-        modelAndView.addObject("error", true);
-        modelAndView.addObject("errorMessage", "File is too large Max allowable size is 1MB");
-        return modelAndView;
+    public String handelExceedIUploadedFileSize(MaxUploadSizeExceededException e, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("errorMessage", "File is too large Max allowable size is 1MB");
+        return "redirect:/result";
     }
 
-//    @ExceptionHandler(value = FileNameExists.class)
-//    public ModelAndView handelFileAlreadyExists(FileNameExists e, ModelMap model) {
-//        model.addAttribute("error", true);
-//        model.addAttribute("errorMessage", "File with the same name already exists");
-//        return new ModelAndView("redirect:/home", model);
-//    }
+    @ExceptionHandler(value = FileNameExists.class)
+    public String handelFileAlreadyExists(FileNameExists e, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("errorMessage", "File with the same name already exists");
+        return "redirect:/result";
+    }
+    @ExceptionHandler(value = IOException.class)
+    public String handleIOException( RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("errorMessage", "File with the same name already exists");
+        return "redirect:/result";
+    }
 
 }
 

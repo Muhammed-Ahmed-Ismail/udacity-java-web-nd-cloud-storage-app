@@ -14,6 +14,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 
@@ -26,20 +27,12 @@ public class FileController {
     }
 
     @PostMapping("/upload")
-    public ModelAndView uploadFile(@RequestParam("fileUpload") MultipartFile file, Authentication authentication, Model model) {
-//        ModelAndView modelAndView = new ModelAndView();
-//        modelAndView.setViewName("redirect:home");
-
-        try {
-            fileService.addFile(file, authentication);
-
-        } catch (IOException E) {
-
-        } catch (FileNameExists e) {
-            model.addAttribute("error", true);
-            model.addAttribute("errorMessage", "File with the same name already exists");
-        }
-        return new ModelAndView("redirect:/home",model.asMap());
+    public String uploadFile(@RequestParam("fileUpload") MultipartFile file,
+                             Authentication authentication, Model model,
+                             RedirectAttributes redirectAttributes) throws IOException {
+        fileService.addFile(file, authentication);
+        redirectAttributes.addFlashAttribute("success", true);
+        return "redirect:/result";
     }
 
     @GetMapping("/file/{fileId}")
@@ -50,8 +43,9 @@ public class FileController {
     }
 
     @DeleteMapping("/file/{fileId}")
-    public String deleteFile(@PathVariable Integer fileId) {
+    public String deleteFile(@PathVariable Integer fileId,RedirectAttributes redirectAttributes) {
         fileService.deleteFile(fileId);
-        return "redirect:/home";
+        redirectAttributes.addFlashAttribute("success",true);
+        return "redirect:/result";
     }
 }

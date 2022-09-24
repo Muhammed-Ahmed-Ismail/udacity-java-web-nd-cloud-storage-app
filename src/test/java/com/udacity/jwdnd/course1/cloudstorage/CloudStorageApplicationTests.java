@@ -76,7 +76,6 @@ class CloudStorageApplicationTests {
 		WebElement inputPassword = driver.findElement(By.id("inputPassword"));
 		inputPassword.click();
 		inputPassword.sendKeys(password);
-
 		// Attempt to sign up.
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("buttonSignUp")));
 		WebElement buttonSignUp = driver.findElement(By.id("buttonSignUp"));
@@ -134,7 +133,7 @@ class CloudStorageApplicationTests {
 	public void testRedirection() {
 		// Create a test account
 		doMockSignUp("Redirection","Test","RT","123");
-		
+
 		// Check if we have been redirected to the log in page.
 		Assertions.assertEquals("http://localhost:" + this.port + "/login", driver.getCurrentUrl());
 	}

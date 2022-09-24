@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,21 +35,17 @@ public class HomeController {
     @GetMapping()
     public String getHomePage(Model model, Authentication authentication,
                               @ModelAttribute("note") Note note,
-                              @ModelAttribute("credential") Credential credential) {
-        try {
-
-            List<List<Credential>> credentials = new ArrayList<>();
-            credentials.add(credentialService.getEncryptCredentialsByUserId(authentication));
-            credentials.add(credentialService.getDecryptCredentialsByUserId(authentication));
-            List<String> filesNames = fileService.getStoredFilesNames(authentication);
-            List<Integer> filesIds = fileService.getStoredFilesIds(authentication);
-            model.addAttribute("notes", noteService.getNotesByUserId(authentication));
-            model.addAttribute("credentials", credentials);
-            model.addAttribute("filesNames", filesNames);
-            model.addAttribute("fileIds", filesIds);
-            return "home";
-        } catch (AuthenticationException e) {
-            return "login";
-        }
+                              @ModelAttribute("credential") Credential credential,
+                              RedirectAttributes redirectAttributes) {
+        List<List<Credential>> credentials = new ArrayList<>();
+        credentials.add(credentialService.getEncryptCredentialsByUserId(authentication));
+        credentials.add(credentialService.getDecryptCredentialsByUserId(authentication));
+        List<String> filesNames = fileService.getStoredFilesNames(authentication);
+        List<Integer> filesIds = fileService.getStoredFilesIds(authentication);
+        model.addAttribute("notes", noteService.getNotesByUserId(authentication));
+        model.addAttribute("credentials", credentials);
+        model.addAttribute("filesNames", filesNames);
+        model.addAttribute("fileIds", filesIds);
+        return "home";
     }
 }
